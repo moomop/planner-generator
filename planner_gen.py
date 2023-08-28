@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import calendar
 import datetime
 import logging
 import os
@@ -127,28 +126,27 @@ for week in range(1, n_weeks_in_year + 1):
         # ...
         # {36} {37} {38} {39} {40} {41} {42}
         #
-        # These replacments are used to replace the days of the month (or empty string
+        # These replacements are used to replace the days of the month (or empty string
         # if the day is outside the current month)
-        # monthcalendar(year,month) returns a list of lists e.g.
-        #>>> calendar.monthcalendar(2023,4)
-        #[[0, 0, 0, 0, 0, 1, 2],
-        # [3, 4, 5, 6, 7, 8, 9],
-        # ...
-        # [24, 25, 26, 27, 28, 29, 30]]
-        # 
-        # we flatten these into a single list and pad with zeros to give the 42
-        # replacements. 
 
-        month_cal = calendar.monthcalendar(year, month)
-        n_weeks_in_month = len(month_cal)
-        month_cal_flat = [d for w in month_cal for d in w]     
-        while len(month_cal_flat) < 42:
-            month_cal_flat.append(0)
-        for i, v in enumerate(month_cal_flat,start=1):
-            if v == 0:
-                template_page_manager.replacements['{'+ str(i) + '}'] = ''
+        # We will want to know the number of weeks in the month. Use this set to keep
+        # track of them.
+        weeks_in_month = set()
+
+        # Iterate over the 42 days starting from first day in the grid
+        first_day_of_month = datetime.date(year,month,1)
+        first_day_of_grid = first_day_of_month - datetime.timedelta(days=first_day_of_month.isocalendar().weekday - 1)
+
+        for day in range(0,42):
+            date = first_day_of_grid + datetime.timedelta(days=day)
+            if date.month != month:
+                # replace dates that are outside current month with empty string
+                template_page_manager.replacements['{'+ str(day+1) + '}'] = ''   
             else:
-                template_page_manager.replacements['{'+ str(i) + '}'] = str(v)
+                template_page_manager.replacements['{'+ str(day+1) + '}'] = str(date.day)
+                weeks_in_month.add(date.isocalendar().week)
+      
+        n_weeks_in_month = len(weeks_in_month)
 
         if month != 1:
           # apart frome the first month, insert a blank page for the left hand side of the
