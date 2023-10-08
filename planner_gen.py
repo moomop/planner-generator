@@ -243,7 +243,7 @@ for a4_svg in a4_svg_files:
     logging.debug(f"Executing command: {cmd}")
     subprocess.run(cmd, shell=True)
 
-# Combine all the A5 pdfs into a single pdf using ghostscript
+# Combine all the A4 pdfs into a single pdf using ghostscript
 logging.info("Merging PDFs using Ghostscript")
 merged_pdf_file = os.path.join(template_page_manager.year_dir,f'merged_year_{year}.pdf')
 cmd = f'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dAutoRotatePages=/None -sOutputFile={merged_pdf_file} {" ".join(a4_pdf_files)}'
